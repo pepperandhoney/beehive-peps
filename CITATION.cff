@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "peps-pipeline v3: a reproducible peptidome prediction pipeline"
+title: "beehive-peps v3: a reproducible peptidome prediction pipeline"
 message: "If you use this software, please cite it as below."
 type: software
 authors:
@@ -9,7 +9,7 @@ authors:
     email: ana.ortega6@utp.ac.pa
 version: 3.0.0
 license: MIT
-repository-code: "https://github.com/pepperandhoney/peps-pipeline"
+repository-code: "https://github.com/pepperandhoney/beehive-peps"
 abstract: >-
   Docker-based pipeline for large-scale MHC-I and MHC-II peptide binding
   prediction. Protein identifiers are renumbered to survive the 15-character

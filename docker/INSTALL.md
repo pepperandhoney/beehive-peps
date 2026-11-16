@@ -8,7 +8,7 @@
 
 ## Overview
 
-This guide documents how to install NetMHCpan inside an interactive Docker container and freeze it as a reusable image. This is the approach used to build the Docker images referenced in the `peps-pipeline` repository.
+This guide documents how to install NetMHCpan inside an interactive Docker container and freeze it as a reusable image. This is the approach used to build the Docker images referenced in the `beehive-peps` repository.
 
 > **Note:** NetMHCpan and NetMHC2pan are licensed tools from DTU Health Tech. You must register with your institutional email to obtain a personalized download link. The software cannot be redistributed.
 >
@@ -196,4 +196,4 @@ docker load < netmhcpan_4.2.tar.gz
 
 - The download links provided by DTU are **personalized and time-limited**. Save your images immediately after building.
 - This guide documents the interactive installation method (`docker commit`). A Dockerfile approximating this process is available in `docker/netmhcpan/Dockerfile` and `docker/netmhc2pan/Dockerfile`, but those are reconstructions and may require adjustments.
-- The `peps-pipeline` scripts expect the images to be tagged exactly as `netmhcpan:4.2` and `netmhc2pan:4.3`.
+- The `beehive-peps` scripts expect the images to be tagged exactly as `netmhcpan:4.2` and `netmhc2pan:4.3`.

@@ -1,4 +1,4 @@
-# peps-pipeline v3
+# beehive-peps v3
 
 **Peptidome prediction pipeline for MHC-I and MHC-II epitope discovery**
 
@@ -57,7 +57,7 @@ accession and description after parsing.
 ## Layout
 
 ```
-peps-pipeline/
+beehive-peps/
 ├── lib/
 │   └── peps_common.sh              paths, registry, logging, run directories
 ├── scripts/
@@ -349,7 +349,7 @@ NetMHCpan and NetMHCIIpan require a separate academic licence from DTU Health Te
 
 - Reynisson B, Alvarez B, Paul S, Peters B, Nielsen M (2020). NetMHCpan-4.1 and
   NetMHCIIpan-4.0. *Nucleic Acids Research* 48:W449–W454.
-- Ortega-Batista AC (2026). peps-pipeline: a reproducible peptidome prediction
+- Ortega-Batista AC (2026). beehive-peps: a reproducible peptidome prediction
   pipeline. Zenodo. https://doi.org/10.5281/zenodo.20837440
 
 ---
