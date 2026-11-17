@@ -1,19 +1,19 @@
 cff-version: 1.2.0
-title: "beehive-peps v3: a reproducible peptidome prediction pipeline"
 message: "If you use this software, please cite it as below."
 type: software
+title: "beehive-peps: scalable orchestration of NetMHCpan and NetMHCIIpan for whole-proteome epitope prediction"
 authors:
-  - family-names: Ortega-Batista
-    given-names: Ana Cristina
-    affiliation: Universidad Tecnologica de Panama
-    email: ana.ortega6@utp.ac.pa
+  - family-names: "Ortega-Batista"
+    given-names: "Ana Cristina"
+    email: "ana.ortega6@utp.ac.pa"
+    orcid: "https://orcid.org/0009-0006-9098-0496"
+    affiliation: "Universidad Tecnológica de Panamá"
 version: 3.0.0
 license: MIT
+doi: 10.5281/zenodo.20837439
 repository-code: "https://github.com/pepperandhoney/beehive-peps"
 abstract: >-
-  Docker-based pipeline for large-scale MHC-I and MHC-II peptide binding
-  prediction. Protein identifiers are renumbered to survive the 15-character
-  header truncation applied by NetMHCpan and restored after parsing, so the
-  protein of origin is never lost. Version 3 adds multilength campaigns, a
-  massive-batch mode built on GNU Parallel, and a shared library that gives
-  every stage the same conventions.
+  Docker-based workflow for large-scale MHC-I and MHC-II peptide binding
+  prediction with NetMHCpan and NetMHCIIpan. Protein identifiers are
+  renumbered to survive the 15-character truncation imposed by the predictors
+  and restored after parsing.

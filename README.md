@@ -1,32 +1,22 @@
-# beehive-peps v3
+# beehive-peps
 
-**Peptidome prediction pipeline for MHC-I and MHC-II epitope discovery**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20837439.svg)](https://doi.org/10.5281/zenodo.20837439)
 
-A reproducible, Docker-based pipeline for large-scale peptide–MHC binding
-prediction with NetMHCpan 4.2 and NetMHCIIpan 4.3. Built for *Leishmania* and
-generalised to any organism.
+**Scalable orchestration of NetMHCpan and NetMHCIIpan for whole-proteome
+epitope prediction**
+
+A reproducible, Docker-based workflow that runs NetMHCpan 4.2 and
+NetMHCIIpan 4.3 over complete proteomes, preserves protein identity through
+the predictors, and returns parsed, merged and quality-checked tables.
+Built for *Leishmania* and generalised to any organism.
+
+The prediction itself is done by NetMHCpan and NetMHCIIpan, which are
+licensed separately by DTU Health Tech. This repository provides the
+orchestration, identity handling, parsing and quality control around them.
 
 ---
 
-## What v3 adds
-
-v2 solved the problem that made the pipeline necessary — protein identity was
-being destroyed by the predictors — but the solution was never wired into the
-flow, and the pipeline could only run one peptide length at a time. v3 finishes
-the job and harmonises the parts.
-
-| | v2 | v3 |
-|---|---|---|
-| Protein identity | `pp_annotate.sh` existed but nothing called it | `end2end.sh` runs it; merged tables arrive annotated |
-| Peptide lengths | one hard-coded length in three separate files | one list in `configs/lengths.conf`, read everywhere |
-| Massive campaigns | a separate `bee`/`hive` pair that had drifted out of sync | `hive.sh` as a first-class mode, sharing the registry, layout and execution unit |
-| Shared conventions | each script resolved paths its own way | `lib/peps_common.sh`, sourced by all |
-| Class I EL columns | only the 4.0 spelling was recognised | both spellings; a silent all-NA column is impossible |
-| Allele names | colons stripped, breaking joins against IEDB | `MHC` verbatim, `MHC_key` punctuation-free |
-| QC | `expected_peptides: SKIPPED` | expected counts computed; an incomplete run exits non-zero |
-| Tests | 33 checks | 57 checks, including both failure modes |
-
-### The problem the pipeline exists for
+## Why this exists
 
 NetMHCpan and NetMHCIIpan truncate the FASTA identifier to 15 characters and
 replace dots with underscores:
@@ -71,8 +61,8 @@ beehive-peps/
 │   │   ├── run_predict.sh          standard mode: one proteome
 │   │   ├── bee.sh                  one job: proteome × allele × length
 │   │   ├── hive.sh                 massive mode: many jobs, GNU Parallel
-│   │   ├── run_NMP_MHC1.sh         wrapper, the v2 name
-│   │   └── run_NMP_MHC2.sh         wrapper, the v2 name
+│   │   ├── run_NMP_MHC1.sh         compatibility wrapper
+│   │   └── run_NMP_MHC2.sh         compatibility wrapper
 │   ├── parse/
 │   │   ├── run_cleanparse.sh       clean → parse → merge → QC
 │   │   ├── cp_cleanout.awk         strip predictor noise
@@ -148,8 +138,7 @@ peptides, check they do not come from a dropped protein.
 
 ### 3. Register it
 
-Add a row to `configs/proteomes.tsv`. **Key and prefix must be identical** —
-letting them drift is what produced three labels for one proteome in v1.
+Add a row to `configs/proteomes.tsv`. **Key and prefix must be identical.**
 
 ```
 key     organism    input_mode  fasta_file  prefix
@@ -244,8 +233,7 @@ Both classes use this schema, so the two tables stack.
 
 - `MHC` is verbatim (`HLA-A02:01`) — use it to join against IEDB, AFND and
   published allele tables, which all carry the colon.
-- `MHC_key` is punctuation-free (`HLA-A0201`) — filenames, and continuity with
-  v1 and v2 output.
+- `MHC_key` is punctuation-free (`HLA-A0201`) — for filenames.
 - `Identity` is the short identifier; `_annotated.tsv` adds `original_id` and
   `description`.
 - `Pep_Len` separates lengths inside a multilength run.
@@ -300,28 +288,6 @@ without editing a script.
 
 ---
 
-## Migrating from v2
-
-Predictions made with v2 remain valid; v3 changes how they are launched and
-parsed, not what the predictors do.
-
-1. Scripts moved into `prep/`, `predict/`, `parse/` and `util/`. The two v2
-   runner names still work as wrappers.
-2. `run_cleanparse.sh` no longer takes a length argument — it reads the lengths
-   from the run metadata, because a multilength run has no single length.
-3. Parsed tables gained `MHC_key` and `Pep_Len`, and `MHC` now keeps its colon.
-   Anything that joined on the colon-free form should use `MHC_key`.
-4. `configs/lengths.conf` is new. Without it the defaults are 9 and 15, which
-   is what v2 did.
-
-Re-parsing a v2 run under v3 is cheap and gives the new columns:
-
-```bash
-bash scripts/parse/run_cleanparse.sh /data/out/.../run_001 MHC1
-```
-
----
-
 ## Reproducibility
 
 - Docker images are built from pinned Dockerfiles with explicit tool versions.
@@ -331,6 +297,13 @@ bash scripts/parse/run_cleanparse.sh /data/out/.../run_001 MHC1
   proteome for every registered proteome.
 - Raw output is archived to Google Cloud Storage before local deletion, and
   `gs_cleandisk.sh` never runs when the backup was skipped.
+
+---
+
+## Related
+
+Downstream prioritization of the peptides produced here is handled by
+[honeycomb-peps](https://github.com/pepperandhoney/honeycomb-peps).
 
 ---
 
@@ -347,14 +320,30 @@ NetMHCpan and NetMHCIIpan require a separate academic licence from DTU Health Te
 
 ## Citation
 
-- Reynisson B, Alvarez B, Paul S, Peters B, Nielsen M (2020). NetMHCpan-4.1 and
-  NetMHCIIpan-4.0. *Nucleic Acids Research* 48:W449–W454.
-- Ortega-Batista AC (2026). beehive-peps: a reproducible peptidome prediction
-  pipeline. Zenodo. https://doi.org/10.5281/zenodo.20837440
+If you use this software, please cite it as:
+
+> Ortega-Batista, A. C. (2026). *beehive-peps: Scalable orchestration of
+> NetMHCpan and NetMHCIIpan for whole-proteome epitope prediction*
+> [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.20837439
+
+Please also cite the prediction tools:
+
+> Nilsson, J. B., Greenbaum, J., Peters, B., & Nielsen, M. (2025).
+> NetMHCpan-4.2: Improved prediction of CD8+ epitopes by use of transfer
+> learning and structural features. *Frontiers in Immunology*.
+> https://doi.org/10.3389/fimmu.2025.1616113
+
+> Nilsson, J. B., Kaabinejadian, S., Yari, H., Kester, M. G. D., van Balen, P.,
+> Hildebrand, W. H., & Nielsen, M. (2023). Accurate prediction of HLA class II
+> antigen presentation across all loci using tailored data acquisition and
+> refined machine learning. *Science Advances*, 9(47), eadj6367.
+> https://doi.org/10.1126/sciadv.adj6367
 
 ---
 
 ## Contact
 
-Ana Cristina Ortega — Universidad Tecnológica de Panamá
-GitHub: @pepperandhoney · ana.ortega6@utp.ac.pa
+Ana Cristina Ortega-Batista — Universidad Tecnológica de Panamá
+ORCID: [0009-0006-9098-0496](https://orcid.org/0009-0006-9098-0496) ·
+GitHub: [@pepperandhoney](https://github.com/pepperandhoney) ·
+ana.ortega6@utp.ac.pa
